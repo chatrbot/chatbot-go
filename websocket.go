@@ -15,17 +15,22 @@ import (
 )
 
 var (
+	//握手建立超时时间
 	handshakeTimeout = 5 * time.Second
+	//心跳超时时间
+	heartbeatTimeout = 20 * time.Second
 )
 
 //监听WebSocket的推送消息
 type WsServer struct {
+	//发送消息时候的并发锁
 	lock  sync.Mutex
 	host  string
 	token string
 	con   *websocket.Conn
 	//接收到消息后的插件调用队列
-	plugins []Plugin
+	plugins        []Plugin
+	heartBeatTimer *time.Timer
 }
 
 //新建WebSocket连接
@@ -76,30 +81,37 @@ func connect(host, token string) (*websocket.Conn, error) {
 
 //Listen 开始监听服务端消息和调用插件
 func (ws *WsServer) Listen() {
+	ws.heartbeat()
 	for {
 		_, msg, err := ws.con.ReadMessage()
 		if err != nil {
 			log.Println("read msg err:", err)
 			log.Println("连接断开,开始重连...")
-			ws.reConnectWebSocket()
+			ws.reconnect()
+			ws.heartbeat()
 			continue
 		}
-		log.Println("收到消息:", string(msg))
-		if len(ws.plugins) > 0 {
-			var rec PushMessage
-			_ = json.Unmarshal(msg, &rec)
+		if string(msg) == "pong" {
+			//log.Println("接收到心跳")
+			ws.heartBeatTimer.Reset(heartbeatTimeout)
+		} else {
+			log.Println("收到消息:", string(msg))
+			if len(ws.plugins) > 0 {
+				var rec PushMessage
+				_ = json.Unmarshal(msg, &rec)
 
-			for _, p := range ws.plugins {
-				if err := p.Do(&rec); err != nil {
-					log.Printf("%s handle error:%s \n", p.Name(), err)
+				for _, p := range ws.plugins {
+					if err := p.Do(&rec); err != nil {
+						log.Printf("%s handle error:%s \n", p.Name(), err)
+					}
 				}
 			}
 		}
 	}
 }
 
-//reConnectWebSocket 断线重连
-func (ws *WsServer) reConnectWebSocket() {
+//reconnect 断线重连
+func (ws *WsServer) reconnect() {
 	for {
 		if ws.con != nil {
 			_ = ws.con.Close()
@@ -113,6 +125,29 @@ func (ws *WsServer) reConnectWebSocket() {
 		log.Println("重连WebSocket失败:", err, ",5s后重试")
 		time.Sleep(5 * time.Second)
 	}
+}
+
+//heartbeat 心跳包
+func (ws *WsServer) heartbeat() {
+	if ws.heartBeatTimer != nil {
+		ws.heartBeatTimer.Stop()
+		ws.heartBeatTimer = nil
+	}
+	ws.heartBeatTimer = time.AfterFunc(heartbeatTimeout, func() {
+		//log.Println("心跳包回应超时,断开连接")
+		//todo 这里直接关闭可能存在并发问题
+		//_ = ws.con.Close()
+	})
+	go func() {
+		for {
+			if err := ws.writeMessage("ping"); err != nil {
+				ws.heartBeatTimer.Stop()
+				ws.heartBeatTimer = nil
+				return
+			}
+			time.Sleep(10 * time.Second)
+		}
+	}()
 }
 
 //addPlugin 添加插件

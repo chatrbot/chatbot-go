@@ -81,7 +81,7 @@ func (p *RepeatPlugin) handleMessage(msg *chatbot.UserMessage) error {
 		} else {
 			switch msg.MsgType {
 			case chatbot.MsgTypeText:
-				return p.bot.SendText(msg.FromUser, fmt.Sprintf("%s 说:%s", msg.GroupMember, msg.GroupContent), nil)
+				return p.bot.SendText(msg.FromUser, msg.PushContent, nil)
 			case chatbot.MsgTypeImg:
 				if rsp, err := p.bot.DownloadPic(msg.GroupContent); err != nil {
 					return fmt.Errorf("下载图片失败:%w", err)

@@ -36,7 +36,6 @@ const (
 //接收到的转发消息
 type UserMessage struct {
 	NewMsgID       int64    `json:"newMsgId"` //消息id,在下载语音时候会用到
-	ReportMsgType  int      `json:"reportMsgType"`
 	FromUser       string   `json:"fromUser"`
 	AtList         []string `json:"atList"`
 	CreateTime     int      `json:"createTime"`
