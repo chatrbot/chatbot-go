@@ -10,13 +10,20 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/tidwall/gjson"
 )
 
 const (
-	defaultTimeOut = time.Second * 30         //默认超时
-	urlSendText    = "/api/v1/chat/sendText"  //发送文本
-	urlSendPic     = "/api/v1/chat/sendPic"   //发送图片
-	urlSendEmoji   = "/api/v1/chat/sendEmoji" //发送表情
+	defaultTimeOut   = time.Second * 30             //默认超时
+	urlSendText      = "/api/v1/chat/sendText"      //发送文本
+	urlSendPic       = "/api/v1/chat/sendPic"       //发送图片
+	urlSendEmoji     = "/api/v1/chat/sendEmoji"     //发送表情
+	urlSendVideo     = "/api/v1/chat/sendVideo"     //发送视频
+	urlSendVoice     = "/api/v1/chat/sendVoice"     //发送语音
+	urlDownloadImage = "/api/v1/chat/downloadImage" //下载图片
+	urlDownloadVideo = "/api/v1/chat/downloadVideo" //下载视频
+	urlDownloadVoice = "/api/v1/chat/downloadVoice" //下载音频
 )
 
 //BotServer 调用机器人http接口的服务
@@ -67,8 +74,9 @@ func (bs *BotServer) baseRequest(addr string, body []byte, duration time.Duratio
 	if rspBody == nil {
 		return errors.New("body is nill")
 	}
+	rspData := gjson.ParseBytes(rspBody).Get("data").String()
 
-	return json.Unmarshal(rspBody, APIRsp)
+	return json.Unmarshal([]byte(rspData), APIRsp)
 }
 
 func (bs *BotServer) toJson(req interface{}) []byte {
@@ -94,5 +102,40 @@ func (bs *BotServer) sendPicMessage(req *SendPicRequest) (*SendPicResponse, erro
 func (bs *BotServer) sendEmojiMessage(req *SendEmojiRequest) (*SendEmojiResponse, error) {
 	rsp := &SendEmojiResponse{}
 	err := bs.baseRequest(urlSendEmoji, bs.toJson(req), defaultTimeOut, rsp)
+	return rsp, err
+}
+
+//sendVideoMessage 发送视频
+func (bs *BotServer) sendVideoMessage(req *SendVideoRequest) (*SendVideoResponse, error) {
+	rsp := &SendVideoResponse{}
+	err := bs.baseRequest(urlSendVideo, bs.toJson(req), defaultTimeOut, rsp)
+	return rsp, err
+}
+
+//sendVoiceMessage 发送音频
+func (bs *BotServer) sendVoiceMessage(req *SendVoiceRequest) (*SendVoiceResponse, error) {
+	rsp := &SendVoiceResponse{}
+	err := bs.baseRequest(urlSendVoice, bs.toJson(req), defaultTimeOut, rsp)
+	return rsp, err
+}
+
+//downloadPic 下载图片消息的图片
+func (bs *BotServer) downloadPic(req *DownloadImageRequest) (*DownloadImageResponse, error) {
+	rsp := &DownloadImageResponse{}
+	err := bs.baseRequest(urlDownloadImage, bs.toJson(req), defaultTimeOut, rsp)
+	return rsp, err
+}
+
+//downloadPic 下载视频消息的视频
+func (bs *BotServer) downloadVideo(req *DownloadVideoRequest) (*DownloadVideoResponse, error) {
+	rsp := &DownloadVideoResponse{}
+	err := bs.baseRequest(urlDownloadVideo, bs.toJson(req), defaultTimeOut, rsp)
+	return rsp, err
+}
+
+//downloadPic 下载语音消息的语音
+func (bs *BotServer) downloadVoice(req *DownloadVoiceRequest) (*DownloadVoiceResponse, error) {
+	rsp := &DownloadVoiceResponse{}
+	err := bs.baseRequest(urlDownloadVoice, bs.toJson(req), defaultTimeOut, rsp)
 	return rsp, err
 }

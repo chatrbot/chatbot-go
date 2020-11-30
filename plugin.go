@@ -1,7 +1,7 @@
 package chatbot
 
-//Plugin 机器人插件
+//Plugin 机器人插件接口
 type Plugin interface {
 	Name() string
-	Do(msg *ReceiveMessage) error
+	Do(msg *PushMessage) error
 }
