@@ -1,3 +1,7 @@
+/*
+一个单纯的复读机插件演示
+没有实际意义，只是用于展示机器人sdk的消息收发能力和具体实现方式
+*/
 package main
 
 import (
@@ -32,7 +36,7 @@ func main() {
 	bot.Run()
 }
 
-//复读机插件
+//群内消息复读机插件
 //会重复群内用户的发送内容
 //用于展示不同消息的收发
 type RepeatPlugin struct {
@@ -73,53 +77,55 @@ func (p *RepeatPlugin) Do(msg *chatbot.PushMessage) error {
 //handleMessage 处理机器人收到的聊天消息
 //其中包含了私聊消息和群消息 需要自己判断
 func (p *RepeatPlugin) handleMessage(msg *chatbot.UserMessage) error {
-	if chatbot.IsGroupMessage(msg.FromUser) {
-		if chatbot.IsBotBeenAt(msg) {
-			if err := p.bot.SendText(msg.FromUser, fmt.Sprintf("@%s 叫我干嘛", msg.WhoAtBot), []string{msg.GroupMember}); err != nil {
-				log.Println("发送@回复失败", err)
+	if chatbot.IsBotBeenAt(msg) {
+		if err := p.bot.SendText(msg.FromUser, fmt.Sprintf("@%s %s", msg.WhoAtBot, "谁在叫我"), []string{msg.GroupMember}); err != nil {
+			log.Println("发送@回复失败", err)
+		}
+	} else {
+		content := msg.Content
+		if chatbot.IsGroupMessage(msg.FromUser) {
+			content = msg.GroupContent
+		}
+		switch msg.MsgType {
+		case chatbot.MsgTypeText:
+			return p.bot.SendText(msg.FromUser, content, nil)
+		case chatbot.MsgTypeImg:
+			if rsp, err := p.bot.DownloadPic(content); err != nil {
+				return fmt.Errorf("下载图片失败:%w", err)
+			} else {
+				log.Println("图片地址", rsp.ImgUrl)
+				if err := p.bot.SendPic(msg.FromUser, rsp.ImgUrl); err != nil {
+					return fmt.Errorf("发送图片消息失败:%w", err)
+				}
 			}
-		} else {
-			switch msg.MsgType {
-			case chatbot.MsgTypeText:
-				return p.bot.SendText(msg.FromUser, msg.PushContent, nil)
-			case chatbot.MsgTypeImg:
-				if rsp, err := p.bot.DownloadPic(msg.GroupContent); err != nil {
-					return fmt.Errorf("下载图片失败:%w", err)
-				} else {
-					log.Println("图片地址", rsp.ImgUrl)
-					if err := p.bot.SendPic(msg.FromUser, rsp.ImgUrl); err != nil {
-						return fmt.Errorf("发送图片消息失败:%w", err)
-					}
+		case chatbot.MsgTypeVoice:
+			if rsp, err := p.bot.DownloadVoice(msg.NewMsgID, content); err != nil {
+				return fmt.Errorf("下载语音失败:%w", err)
+			} else {
+				log.Println("语音地址", rsp.VoiceUrl)
+				if err := p.bot.SendVoice(msg.FromUser, rsp.VoiceUrl); err != nil {
+					return fmt.Errorf("发送图片消息失败:%w", err)
 				}
-			case chatbot.MsgTypeVoice:
-				if rsp, err := p.bot.DownloadVoice(msg.NewMsgID, msg.GroupContent); err != nil {
-					return fmt.Errorf("下载语音失败:%w", err)
-				} else {
-					log.Println("语音地址", rsp.VoiceUrl)
-					if err := p.bot.SendVoice(msg.FromUser, rsp.VoiceUrl); err != nil {
-						return fmt.Errorf("发送图片消息失败:%w", err)
-					}
-				}
-			case chatbot.MsgTypeVideo:
-				if rsp, err := p.bot.DownloadVideo(msg.GroupContent); err != nil {
-					return fmt.Errorf("下载视频失败:%w", err)
-				} else {
-					log.Println("视频地址", rsp.VideoUrl)
-					if err := p.bot.SendVideo(msg.FromUser, rsp.VideoUrl, "https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1472019148,226459533&fm=26&gp=0.jpg"); err != nil {
-						return fmt.Errorf("发送图片消息失败:%w", err)
-					}
-				}
-			case chatbot.MsgTypeEmoji:
-				if md5, l, err := p.bot.ParseEmojiXML(msg.GroupContent); err != nil {
-					return fmt.Errorf("解析表情失败:%w", err)
-				} else {
-					if err := p.bot.SendEmoji(msg.FromUser, md5, l); err != nil {
-						return fmt.Errorf("发送Emoji图片消息失败:%w", err)
-					}
-				}
-			default:
-				log.Println("未知消息类型:", msg.MsgType)
 			}
+		case chatbot.MsgTypeVideo:
+			if rsp, err := p.bot.DownloadVideo(content); err != nil {
+				return fmt.Errorf("下载视频失败:%w", err)
+			} else {
+				log.Println("视频地址", rsp.VideoUrl)
+				if err := p.bot.SendVideo(msg.FromUser, rsp.VideoUrl, "http://5b0988e595225.cdn.sohucs.com/images/20200213/cfcf842cd2284a5f91de0b1ee60a23b0.jpeg"); err != nil {
+					return fmt.Errorf("发送视频消息失败:%w", err)
+				}
+			}
+		case chatbot.MsgTypeEmoji:
+			if md5, l, err := p.bot.ParseEmojiXML(content); err != nil {
+				return fmt.Errorf("解析表情失败:%w", err)
+			} else {
+				if err := p.bot.SendEmoji(msg.FromUser, md5, l); err != nil {
+					return fmt.Errorf("发送Emoji图片消息失败:%w", err)
+				}
+			}
+		default:
+			log.Println("未知消息类型:", msg.MsgType)
 		}
 	}
 	return nil
