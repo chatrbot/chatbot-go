@@ -1,4 +1,4 @@
-module chatbot-go
+module github.com/chatrbot/chatbot-go
 
 go 1.15
 
