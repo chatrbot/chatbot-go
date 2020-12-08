@@ -5,7 +5,6 @@
 package main
 
 import (
-	chatbot "chatbot-go"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -13,6 +12,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+
+	"github.com/chatrbot/chatbot-go"
 
 	"github.com/tidwall/gjson"
 )
@@ -69,7 +70,7 @@ func (p *AIPlugin) Do(msg *chatbot.PushMessage) error {
 			//如果是机器人被@了
 			if chatbot.IsBotBeenAt(message) {
 				keyword := chatbot.SplitAtContent(message.GroupContent)
-				reply, err := OwnThinkAPI(keyword)
+				reply, err := OwnThinkAPI(message.GroupMember, keyword)
 				if err != nil {
 					return err
 				}
@@ -82,7 +83,7 @@ func (p *AIPlugin) Do(msg *chatbot.PushMessage) error {
 				}
 			}
 		} else {
-			reply, err := OwnThinkAPI(message.Content)
+			reply, err := OwnThinkAPI(message.FromUser, message.Content)
 			if err != nil {
 				return err
 			}
@@ -99,10 +100,10 @@ func (p *AIPlugin) Do(msg *chatbot.PushMessage) error {
 }
 
 //OwnThinkBot 思知AI接口
-func OwnThinkAPI(content string) (string, error) {
+func OwnThinkAPI(userID, content string) (string, error) {
 	log.Println("Receive Content", content)
 	c := url.QueryEscape(content)
-	rsp, err := http.DefaultClient.Get(fmt.Sprintf("https://api.ownthink.com/bot?appid=%s&userid=user&spoken=%s", *AIToken, c))
+	rsp, err := http.DefaultClient.Get(fmt.Sprintf("https://api.ownthink.com/bot?appid=%s&userid=%s&spoken=%s", *AIToken, userID, c))
 	if err != nil {
 		return "", err
 	}

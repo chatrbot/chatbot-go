@@ -5,11 +5,12 @@
 package main
 
 import (
-	"chatbot-go"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
+
+	"github.com/chatrbot/chatbot-go"
 )
 
 // token 修改为从机器人处获得的token
