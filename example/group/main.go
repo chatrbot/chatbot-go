@@ -75,7 +75,7 @@ func (p *GroupManagerPlugin) Do(msg *chatbot.PushMessage) error {
 // 使用@的方法可以做到快速踢人:@somebody 踢
 // 命令机器人踢出群成员,注意机器人必须为群管理员身份
 func (p *GroupManagerPlugin) handleMessage(msg *chatbot.UserMessage) error {
-	kickKeyword := "踢123"
+	kickKeyword := "踢"
 	if chatbot.IsGroupMessage(msg.FromUser) &&
 		msg.MsgType == chatbot.MsgTypeText &&
 		len(msg.AtList) > 0 {
