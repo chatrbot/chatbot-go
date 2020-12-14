@@ -24,7 +24,7 @@ const (
 	urlDownloadImage  = "/api/v1/chat/downloadImage"         //下载图片
 	urlDownloadVideo  = "/api/v1/chat/downloadVideo"         //下载视频
 	urlDownloadVoice  = "/api/v1/chat/downloadVoice"         //下载音频
-	urlDelGroupMember = "/api/v1/chatroom/delChatRoomMember" //下载音频
+	urlDelGroupMember = "/api/v1/chatroom/delChatRoomMember" //删除群成员
 )
 
 //BotServer 调用机器人http接口的服务
