@@ -2,6 +2,7 @@ package chatbot
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -160,6 +161,9 @@ func (ws *WsServer) addPlugin(plugin ...Plugin) {
 func (ws *WsServer) writeMessage(message string) error {
 	ws.lock.Lock()
 	defer ws.lock.Unlock()
+	if ws.con == nil {
+		return errors.New("WebSocket con is nil")
+	}
 	return ws.con.WriteMessage(websocket.TextMessage, []byte(message))
 }
 
