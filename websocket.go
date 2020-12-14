@@ -115,12 +115,13 @@ func (ws *WsServer) Listen() {
 func (ws *WsServer) reconnect() {
 	for {
 		if ws.con != nil {
-			_ = ws.con.Close()
-			ws.con = nil
+			ws.Close()
 		}
 		con, err := connect(ws.host, ws.token)
 		if err == nil {
+			ws.lock.Lock()
 			ws.con = con
+			ws.lock.Unlock()
 			return
 		}
 		log.Println("重连WebSocket失败:", err, ",5s后重试")
@@ -135,9 +136,8 @@ func (ws *WsServer) heartbeat() {
 		ws.heartBeatTimer = nil
 	}
 	ws.heartBeatTimer = time.AfterFunc(heartbeatTimeout, func() {
-		//log.Println("心跳包回应超时,断开连接")
-		//todo 这里直接关闭可能存在并发问题
-		//_ = ws.con.Close()
+		log.Println("心跳包回应超时,断开连接")
+		ws.Close()
 	})
 	go func() {
 		for {
@@ -164,6 +164,9 @@ func (ws *WsServer) writeMessage(message string) error {
 }
 
 //关闭WebSocket连接
-func (ws *WsServer) Close() error {
-	return ws.con.Close()
+func (ws *WsServer) Close() {
+	ws.lock.Lock()
+	_ = ws.con.Close()
+	ws.con = nil
+	ws.lock.Unlock()
 }

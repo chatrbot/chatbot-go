@@ -75,10 +75,19 @@ func (p *GroupManagerPlugin) Do(msg *chatbot.PushMessage) error {
 // 使用@的方法可以做到快速踢人:@somebody 踢
 // 命令机器人踢出群成员,注意机器人必须为群管理员身份
 func (p *GroupManagerPlugin) handleMessage(msg *chatbot.UserMessage) error {
-	kickKeyword := "踢"
+	kickKeyword := "踢123"
 	if chatbot.IsGroupMessage(msg.FromUser) &&
 		msg.MsgType == chatbot.MsgTypeText &&
 		len(msg.AtList) > 0 {
+		//判断身份这条消息发送人的身份
+		if !msg.IsAdmin() && !msg.IsGroupOwner() {
+			if err := p.bot.SendText(msg.FromUser, "你不是管理员不能命令我", []string{msg.GroupMember}); err != nil {
+				log.Println("发送消息失败", err)
+				return err
+			}
+			return errors.New("不是管理员身份,不能进行操作")
+		}
+
 		content := chatbot.SplitAtContent(msg.GroupContent)
 		if content == kickKeyword {
 			_, err := p.bot.DelGroupMembers(msg.FromUser, msg.AtList)
