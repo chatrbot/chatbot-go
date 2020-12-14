@@ -53,10 +53,11 @@ type UserMessage struct {
 	Content        string   `json:"content"`
 	MsgSource      string   `json:"msgSource"`
 	//群内消息才会用到的字段
-	WhoAtBot        string `json:"whoAtBot"`        //谁@的机器人,微信昵称,方便客户端机器人反向@
-	GroupMember     string `json:"groupMember"`     //如果是群聊消息,则为分离content后的发言人微信号
-	GroupMemberRole int8   `json:"groupMemberRole"` //用户在群内身份,1成员,2管理员,3群主
-	GroupContent    string `json:"groupContent"`    //如果是群消息,则为分离content后的群消息内容
+	WhoAtBot            string `json:"whoAtBot"`            //谁@的机器人,微信昵称,方便客户端机器人反向@
+	GroupMember         string `json:"groupMember"`         //如果是群聊消息,则为分离content后的发言人微信号
+	GroupMemberNickname string `json:"groupMemberNickname"` //群内说话人的微信昵称
+	GroupMemberRole     int8   `json:"groupMemberRole"`     //用户在群内身份,1成员,2管理员,3群主
+	GroupContent        string `json:"groupContent"`        //如果是群消息,则为分离content后的群消息内容
 }
 
 func (m *UserMessage) IsAdmin() bool {
