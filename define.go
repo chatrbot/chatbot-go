@@ -175,4 +175,12 @@ type (
 		VoiceLength int64  `json:"voiceLength"` //语音长度
 		VoiceUrl    string `json:"voiceUrl"`    //语音地址
 	}
+	//删除群成员
+	DelGroupRequest struct {
+		Group      string   `json:"chatroom"`   //群号
+		MemberList []string `json:"memberList"` //删除人员
+	}
+	DelGroupResponse struct {
+		DelMemberList []string `json:"delMemberList"`
+	}
 )

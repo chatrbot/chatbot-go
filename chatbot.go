@@ -157,3 +157,15 @@ func (cb *ChatBot) ParseEmojiXML(xml string) (md5, length string, err error) {
 	length = e.SelectAttr("len").Value
 	return
 }
+
+//DelGroupMembers 删除群成员
+func (cb *ChatBot) DelGroupMembers(group string, members []string) ([]string, error) {
+	rsp, err := cb.bot.delGroupMembers(&DelGroupRequest{
+		Group:      group,
+		MemberList: members,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return rsp.DelMemberList, nil
+}

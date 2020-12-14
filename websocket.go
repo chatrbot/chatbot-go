@@ -39,6 +39,7 @@ func newWsServer(host, token string) (*WsServer, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Println("connect server success")
 	return &WsServer{
 		con:     con,
 		plugins: make([]Plugin, 0, 10),
