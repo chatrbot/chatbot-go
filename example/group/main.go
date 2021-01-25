@@ -58,6 +58,7 @@ func (p *GroupManagerPlugin) Do(msg *chatbot.PushMessage) error {
 		if err := json.Unmarshal(msg.Data, m); err != nil {
 			return err
 		}
+		log.Println(m.FromUser)
 		return p.handleMessage(m)
 	case chatbot.CusMsgTypeGroupEvent:
 		e := &chatbot.GroupBotEvent{}

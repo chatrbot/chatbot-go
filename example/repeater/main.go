@@ -37,9 +37,9 @@ func main() {
 	bot.Run()
 }
 
-//群内消息复读机插件
-//会重复群内用户的发送内容
-//用于展示不同消息的收发
+// 群内消息复读机插件
+// 会重复群内用户的发送内容
+// 用于展示不同消息的收发
 type RepeatPlugin struct {
 	bot  *chatbot.ChatBot
 	name string
@@ -75,8 +75,8 @@ func (p *RepeatPlugin) Do(msg *chatbot.PushMessage) error {
 	return nil
 }
 
-//handleMessage 处理机器人收到的聊天消息
-//其中包含了私聊消息和群消息 需要自己判断
+// handleMessage 处理机器人收到的聊天消息
+// 其中包含了私聊消息和群消息 需要自己判断
 func (p *RepeatPlugin) handleMessage(msg *chatbot.UserMessage) error {
 	if chatbot.IsBotBeenAt(msg) {
 		if err := p.bot.SendText(msg.FromUser, fmt.Sprintf("@%s %s", msg.WhoAtBot, "谁在叫我"), []string{msg.GroupMember}); err != nil {
@@ -132,7 +132,7 @@ func (p *RepeatPlugin) handleMessage(msg *chatbot.UserMessage) error {
 	return nil
 }
 
-//handleGroupEvent 处理群内事件
+// handleGroupEvent 处理群内事件
 func (p *RepeatPlugin) handleGroupEvent(msg *chatbot.GroupBotEvent) error {
 	switch msg.Event {
 	case chatbot.GroupEventInvited:

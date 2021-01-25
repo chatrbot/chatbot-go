@@ -43,7 +43,7 @@ func main() {
 	bot.Run()
 }
 
-//AI插件,接入AI API,可以和用户做智能对话
+// AI插件,接入AI API,可以和用户做智能对话
 type AIPlugin struct {
 	bot  *chatbot.ChatBot
 	name string
@@ -65,9 +65,9 @@ func (p *AIPlugin) Do(msg *chatbot.PushMessage) error {
 		if err := json.Unmarshal(msg.Data, message); err != nil {
 			return err
 		}
-		//如果是群内消息
+		// 如果是群内消息
 		if chatbot.IsGroupMessage(message.FromUser) {
-			//如果是机器人被@了
+			// 如果是机器人被@了
 			if chatbot.IsBotBeenAt(message) {
 				keyword := chatbot.SplitAtContent(message.GroupContent)
 				reply, err := OwnThinkAPI(message.GroupMember, keyword)
@@ -99,7 +99,7 @@ func (p *AIPlugin) Do(msg *chatbot.PushMessage) error {
 	return nil
 }
 
-//OwnThinkBot 思知AI接口
+// OwnThinkBot 思知AI接口
 func OwnThinkAPI(userID, content string) (string, error) {
 	log.Println("Receive Content", content)
 	c := url.QueryEscape(content)
