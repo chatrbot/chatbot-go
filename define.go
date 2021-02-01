@@ -26,11 +26,12 @@ type PushMessage struct {
 
 // 收到的转发消息具体分类
 const (
-	MsgTypeText  = 1  // 文本消息
-	MsgTypeImg   = 3  // 图片消息
-	MsgTypeVoice = 34 // 语音消息
-	MsgTypeVideo = 43 // 视频消息
-	MsgTypeEmoji = 47 // 表情动图消息
+	MsgTypeText   = 1  // 文本消息
+	MsgTypeImg    = 3  // 图片消息
+	MsgTypeVoice  = 34 // 语音消息
+	MsgTypeVideo  = 43 // 视频消息
+	MsgTypeEmoji  = 47 // 表情动图消息
+	MsgTypeApplet = 49 // 小程序
 )
 
 const (
@@ -161,6 +162,27 @@ type (
 		VideoThumbUrl string `json:"videoThumbUrl"` // 视频缩略图地址
 	}
 	SendVideoResponse struct {
+		ClientMsgId string `json:"clientMsgId"` // 客户端消息ID
+		MsgId       int64  `json:"msgId"`       // 服务端消息ID
+		NewMsgId    int64  `json:"newMsgId"`    // 服务端消息ID
+	}
+	// 发送小程序
+	SendMiniProgramRequest struct {
+		ToUser            string `json:"toUser"`            // 接收人微信号/ID
+		ThumbUrl          string `json:"thumbUrl"`          //	缩略图地址
+		Title             string `json:"title"`             // 标题
+		Des               string `json:"des"`               // 描述
+		Url               string `json:"url"`               //	地址
+		SourceUserName    string `json:"sourceUserName"`    // 来源用户名
+		SourceDisplayName string `json:"sourceDisplayName"` // 来源显示名
+		Username          string `json:"username"`          // 用户名
+		AppId             string `json:"appid"`             // 小程序 APPID
+		Type              int    `json:"type"`              // 类型
+		Version           int    `json:"version"`           // 版本
+		IconUrl           string `json:"iconUrl"`           //  图标地址
+		PagePath          string `json:"pagePath"`          // 启动页
+	}
+	SendMiniProgramResponse struct {
 		ClientMsgId string `json:"clientMsgId"` // 客户端消息ID
 		MsgId       int64  `json:"msgId"`       // 服务端消息ID
 		NewMsgId    int64  `json:"newMsgId"`    // 服务端消息ID

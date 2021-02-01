@@ -15,16 +15,17 @@ import (
 )
 
 const (
-	defaultTimeOut    = time.Second * 30                     // 默认超时
-	urlSendText       = "/api/v1/chat/sendText"              // 发送文本
-	urlSendPic        = "/api/v1/chat/sendPic"               // 发送图片
-	urlSendEmoji      = "/api/v1/chat/sendEmoji"             // 发送表情
-	urlSendVideo      = "/api/v1/chat/sendVideo"             // 发送视频
-	urlSendVoice      = "/api/v1/chat/sendVoice"             // 发送语音
-	urlDownloadImage  = "/api/v1/chat/downloadImage"         // 下载图片
-	urlDownloadVideo  = "/api/v1/chat/downloadVideo"         // 下载视频
-	urlDownloadVoice  = "/api/v1/chat/downloadVoice"         // 下载音频
-	urlDelGroupMember = "/api/v1/chatroom/delChatRoomMember" // 删除群成员
+	defaultTimeOut     = time.Second * 30                     // 默认超时
+	urlSendText        = "/api/v1/chat/sendText"              // 发送文本
+	urlSendPic         = "/api/v1/chat/sendPic"               // 发送图片
+	urlSendEmoji       = "/api/v1/chat/sendEmoji"             // 发送表情
+	urlSendVideo       = "/api/v1/chat/sendVideo"             // 发送视频
+	urlSendVoice       = "/api/v1/chat/sendVoice"             // 发送语音
+	urlSendMiniProgram = "/api/v1/chat/sendSmallApp"          // 发送语音
+	urlDownloadImage   = "/api/v1/chat/downloadImage"         // 下载图片
+	urlDownloadVideo   = "/api/v1/chat/downloadVideo"         // 下载视频
+	urlDownloadVoice   = "/api/v1/chat/downloadVoice"         // 下载音频
+	urlDelGroupMember  = "/api/v1/chatroom/delChatRoomMember" // 删除群成员
 )
 
 // BotServer 调用机器人http接口的服务
@@ -122,6 +123,13 @@ func (bs *BotServer) sendVideoMessage(req *SendVideoRequest) (*SendVideoResponse
 func (bs *BotServer) sendVoiceMessage(req *SendVoiceRequest) (*SendVoiceResponse, error) {
 	rsp := &SendVoiceResponse{}
 	err := bs.baseRequest(urlSendVoice, bs.toJson(req), defaultTimeOut, rsp)
+	return rsp, err
+}
+
+// sendMiniProgramMessage 发送小程序
+func (bs *BotServer) sendMiniProgramMessage(req *SendMiniProgramRequest) (*SendMiniProgramResponse, error) {
+	rsp := &SendMiniProgramResponse{}
+	err := bs.baseRequest(urlSendMiniProgram, bs.toJson(req), defaultTimeOut, rsp)
 	return rsp, err
 }
 

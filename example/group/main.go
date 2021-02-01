@@ -80,7 +80,7 @@ func (p *GroupManagerPlugin) handleMessage(msg *chatbot.UserMessage) error {
 	if chatbot.IsGroupMessage(msg.FromUser) &&
 		msg.MsgType == chatbot.MsgTypeText &&
 		len(msg.AtList) > 0 {
-		//判断身份这条消息发送人的身份
+		// 判断身份这条消息发送人的身份
 		if !msg.IsAdmin() && !msg.IsGroupOwner() {
 			if err := p.bot.SendText(msg.FromUser, "你不是管理员不能命令我", []string{msg.GroupMember}); err != nil {
 				log.Println("发送消息失败", err)
@@ -101,7 +101,7 @@ func (p *GroupManagerPlugin) handleMessage(msg *chatbot.UserMessage) error {
 	return errors.New("未处理的消息类型")
 }
 
-//handleGroupEvent 处理群内事件
+// handleGroupEvent 处理群内事件
 func (p *GroupManagerPlugin) handleGroupEvent(msg *chatbot.GroupBotEvent) error {
 	switch msg.Event {
 	case chatbot.GroupEventInvited:

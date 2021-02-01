@@ -123,6 +123,25 @@ func (bot *ChatBot) SendEmoji(toUser, emojiMd5, emojiLen string) error {
 	return err
 }
 
+// SendMiniProgram 发送小程序
+// toUser	接收人微信号/ID
+// thumbUrl	缩略图地址
+// title 标题
+// des 描述
+// url 地址
+// sourceUserName 来源用户名
+// sourceDisplayName 来源显示名
+// username	用户名
+// appId 小程序AppId
+// type 类型
+// version 版本
+// iconUrl 图标地址
+// pagePath 启动页
+func (bot *ChatBot) SendMiniProgram(req *SendMiniProgramRequest) error {
+	_, err := bot.bot.sendMiniProgramMessage(req)
+	return err
+}
+
 // DownloadPic 下载图片
 func (bot *ChatBot) DownloadPic(xml string) (*DownloadImageResponse, error) {
 	return bot.bot.downloadPic(&DownloadImageRequest{XML: xml})
